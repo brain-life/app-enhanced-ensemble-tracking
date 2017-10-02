@@ -1,0 +1,186 @@
+#!/bin/bash
+
+[ "$PBS_O_WORKDIR" ] && cd $PBS_O_WORKDIR
+
+if [ $ENV == "IUHPC" ]; then
+    module load mrtrix/0.2.12
+    module load freesurfer/6.0.0
+    module load matlab
+    module load python
+    SUBJECTS_DIR=`pwd`
+    source $FREESURFER_HOME/SetUpFreeSurfer.sh
+fi
+
+if [ $ENV == "VM" ]; then
+    export FREESURFER_HOME=/usr/local/freesurfer
+    source $FREESURFER_HOME/SetUpFreeSurfer.sh
+fi
+
+OUTDIR=./output
+mkdir $OUTDIR
+
+## grab the config.json inputs
+DWI=`$SERVICE_DIR/jq -r '.dwi' config.json`
+BVALS=`$SERVICE_DIR/jq -r '.bvals' config.json`
+BVECS=`$SERVICE_DIR/jq -r '.bvecs' config.json`
+
+MASK=`$SERVICE_DIR/jq -r '.mask' config.json`
+WMMASK=`$SERVICE_DIR/jq -r '.wmmask' config.json`
+CCMASK=`$SERVICE_DIR/jq -r '.ccmask' config.json`
+TMASK=`$SERVICE_DIR/jq -r '.tmask' config.json`
+
+DOPROB=`$SERVICE_DIR/jq -r '.do_probabilistic' config.json`
+PROB_CURVS=`$SERVICE_DIR/jq -r 'prob_curvs' config.json`
+
+DOSTREAM=`$SERVICE_DIR/jq -r '.do_deterministic' config.json`
+STREAM_CURVS=`$SERVICE_DIR/jq -r .stream_curvs' config.json`
+
+DOTENSOR=`$SERVICE_DIR/jq -r '.do_tensor' config.json`
+
+#SPC_LMAX=`$SERVICE_DIR/jq -r '.spc_lmax' config.json`
+
+NUMWMFIBERS=`$SERVICE_DIR/jq -r '.fibers' config.json`
+MAXNUMWMFIBERS=$(($NUMWMFIBERS*2))
+
+NUMCCFIBERS=$(($NUMWMFIBERS/5))
+MAXNUMCCFIBERS=$(($NUMCCFIBERS*2))
+
+## make gradient from bvals / bvecs
+cat $BVECS $BVALS >> $OUTDIR/tmp.b
+
+awk '
+{ 
+    for (i=1; i<=NF; i++)  {
+        a[NR,i] = $i
+    }
+}
+NF>p { p = NF }
+END {    
+    for(j=1; j<=p; j++) {
+        str=a[1,j]
+        for(i=2; i<=NR; i++){
+            str=str" "a[i,j];
+        }
+        print str
+    }
+}' $OUTDIR/tmp.b > $OUTDIR/grad.b
+
+rm -f $OUTDIR/tmp.b
+
+GRAD=$OUTDIR/grad.b
+
+MAXLMAX=`$SERVICE_DIR/jq -r '.max_lmax' config.json`
+if [[ $MAXLMAX == "null" || -z $MAXLMAX ]]; then
+
+    echo "Maximum L_{max} is empty... Determining highest L_{max} possible from grad.b"
+
+    ## determine count of b0s
+    VOLS=`cat $OUTDIR/grad.b | wc -l`
+    BNOT=`grep '0 0 0 0' $OUTDIR/grad.b | wc -l`
+    COUNT=$(($VOLS-$BNOT))
+    
+    lmax=0
+    while [ $((($lmax+3)*($lmax+4)/2)) -le $COUNT ]; do
+	MAXLMAX=$(($lmax+2))
+    done
+    
+fi
+
+echo 
+echo Converting files for MRTrix processing...
+echo 
+
+mrconvert ${DWI} $OUTDIR/dwi.mif
+mrconvert ${MASK} $OUTDIR/mask.mif
+mrconvert ${WMMASK} $OUTDIR/wm.mif
+mrconvert ${CCMASK} $OUTDIR/cc.mif
+mrconvert ${TMASK} $OUTDIR/tm.mif
+
+echo
+echo Preparing data for tracking...
+echo
+
+estimate_response -quiet $OUTDIR/dwi.mif $OUTDIR/cc.mif -grad $GRAD $OUTDIR/response.txt
+
+
+if [ $DOTENSOR == "true" ]; then
+
+   echo
+   echo Fitting tensor model...
+   echo
+   
+   dwi2tensor -quiet $OUTPUT/dwi.mif -grad $GRAD $OUTPUT/dt.mif
+
+fi
+
+echo 
+echo Estimating multiple CSD fits...
+echo 
+
+for (( i_lmax=2; i_lmax<=$MAXLMAX; i_lmax+=2 )); do
+    
+	csdeconv -quiet $OUTDIR/dwi.mif -grad $GRAD $OUTDIR/response.txt -lmax $i_lmax -mask $OUTDIR/mask.mif $OUTDIR/lmax${i_lmax}.mif
+
+done 
+
+echo
+echo Tracking ensemble tractogram...
+echo
+
+if [ $DOTENSOR == "true" ] ; then
+
+    echo "Performing tensor tracking..."
+    streamtrack -quiet DT_STREAM $OUTPUT/dwi.mif $OUTPUT/wm_tensor.tck -seed $WMMASK -mask $TMASK -grad $GRAD -number $NUMWMFIBERS -maxnum $MAXNUMWMFIBERS
+    streamtrack -quiet DT_STREAM $OUTPUT/dwi.mif $OUTPUT/cc_tensor.tck -seed $CCMASK -mask $TMASK -grad $GRAD -number $NUMCCFIBERS -maxnum $MAXNUMCCFIBERS
+    
+fi
+
+if [ $DOSTREAM == "true" ] ; then
+    
+    for (( i_lmax=2; i_lmax<=$MAXLMAX; i_lmax+=2 )); do
+
+	for $i_curv in $STREAM_CURVS; do
+
+	    streamtrack -quiet SD_STREAM $OUTDIR/lmax${i_lmax}.mif $OUTPUT/detr_lmax${i_lmax}_curv${i_curv}_wm.tck -seed $WMMASK -mask $TMASK -grad $GRAD -curvature ${i_curv} -number $NUMWMFIBERS -maxnum $MAXNUMWMFIBERS
+	    streamtrack -quiet SD_STREAM $OUTDIR/lmax${i_lmax}.mif $OUTPUT/detr_lmax${i_lmax}_curv${i_curv}_cc.tck -seed $CCMASK -mask $TMASK -grad $GRAD -curvature ${i_curv} -number $NUMCCFIBERS -maxnum $MAXNUMCCFIBERS
+
+	done
+	
+    done
+fi
+
+if [ $DOPROB == "true" ] ; then
+    
+    for (( i_lmax=2; i_lmax<=$MAXLMAX; i_lmax+=2 )); do
+
+	for $i_curv in $PROB_CURVS; do
+
+	    streamtrack -quiet SD_PROB $OUTDIR/lmax${i_lmax}.mif $OUTPUT/prob_lmax${i_lmax}_curv${i_curv}_wm.tck -seed $WMMASK -mask $TMASK -grad $GRAD -curvature ${i_curv} -number $NUMWMFIBERS -maxnum $MAXNUMWMFIBERS
+	    streamtrack -quiet SD_PROB $OUTDIR/lmax${i_lmax}.mif $OUTPUT/prob_lmax${i_lmax}_curv${i_curv}_cc.tck -seed $CCMASK -mask $TMASK -grad $GRAD -curvature ${i_curv} -number $NUMCCFIBERS -maxnum $MAXNUMCCFIBERS
+
+	done
+	
+    done
+fi
+
+# ## FIGURE OUT HOW TO COMPUTE NUMBER OF STREAMLINES
+# ## JUST MATCH FINAL ENSEMBLE AND DO THIS LAST
+# if [ $SPC_LMAX gt 0 ]
+
+#    echo
+#    echo Tracking single parameter tractogram...
+#    echo
+   
+#    ## track single parameter seeding entire white matter
+#    streamtrack SD_PROB $OUTDIR/${DWIFILENAME}_lmax${spc_lmax}.mif $OUTDIR/spc_wm_tracts_csd_lmax${spc_lmax}_prob_NUM_500k.tck \
+#                -seed $OUTDIR/${DWIFILENAME}_wm.mif -mask $OUTDIR/${DWIFILENAME}_wm.mif -grad $GRAD -number 500000 -maxnum 1000000
+
+#    ## track single parameter tractogram seeding only corpus callosum
+#    streamtrack SD_PROB $OUTDIR/${DWIFILENAME}_lmax${spc_lmax}.mif $OUTDIR/spc_cc_csd_lmax${spc_lmax}_prob_NUM_100k.tck \
+#                -seed $OUTDIR/${DWIFILENAME}_cc.mif -mask $OUTDIR/${DWIFILENAME}_wm.mif -grad $GRAD -number 100000 -maxnum 500000
+   
+# fi
+
+echo 
+echo DONE tracking
+echo

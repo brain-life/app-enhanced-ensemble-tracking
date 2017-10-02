@@ -1,0 +1,16 @@
+#!/bin/bash
+#PBS -l nodes=1:ppn=1:dc2,walltime=02:00:00
+#PBS -N app-freesurfer-post
+#PBS -V
+
+## set up environment for HPC
+cd $PBS_O_WORKDIR
+module load fsl/5.0.9
+module load freesurfer/6.0.0
+
+## run tool
+bash $SERVICE_DIR/main.sh
+
+## check if it worked? this just assumes it succeeds
+echo 0 > finished
+

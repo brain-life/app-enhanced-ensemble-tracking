@@ -1,0 +1,26 @@
+{
+  "name": "sca-service-enahnced-ensemble-tracking",
+  "version": "1.0.0",
+  "description": "better ensemble tracking with extra tracking of undersampled
+  areas",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "start.sh",
+    "stop": "stop.sh",
+    "status": "status.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/brain-life/app-enhanced-ensemble-tracking.git"
+  },
+  "author": "Brent McPherson <bcmcpher@iu.edu>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/brain-life/app-enhanced-ensemble-tracking/issues"
+  },
+  "homepage": "https://github.com/brain-life/app-enhanced-ensemble-tracking#readme"
+}
