@@ -37,15 +37,13 @@ STREAM_CURVS=`$SERVICE_DIR/jq -r .stream_curvs' config.json`
 
 DOTENSOR=`$SERVICE_DIR/jq -r '.do_tensor' config.json`
 
-#SPC_LMAX=`$SERVICE_DIR/jq -r '.spc_lmax' config.json`
-
 NUMWMFIBERS=`$SERVICE_DIR/jq -r '.fibers' config.json`
 MAXNUMWMFIBERS=$(($NUMWMFIBERS*2))
 
 NUMCCFIBERS=$(($NUMWMFIBERS/5))
 MAXNUMCCFIBERS=$(($NUMCCFIBERS*2))
 
-## make gradient from bvals / bvecs
+## make grad.b from bvals / bvecs
 cat $BVECS $BVALS >> $OUTDIR/tmp.b
 
 awk '
@@ -72,7 +70,7 @@ GRAD=$OUTDIR/grad.b
 MAXLMAX=`$SERVICE_DIR/jq -r '.max_lmax' config.json`
 if [[ $MAXLMAX == "null" || -z $MAXLMAX ]]; then
 
-    echo "Maximum L_{max} is empty... Determining highest L_{max} possible from grad.b"
+    echo "Maximum L_{max} is empty. Determining highest L_{max} possible from grad.b"
 
     ## determine count of b0s
     VOLS=`cat $OUTDIR/grad.b | wc -l`
@@ -162,24 +160,6 @@ if [ $DOPROB == "true" ] ; then
 	
     done
 fi
-
-# ## FIGURE OUT HOW TO COMPUTE NUMBER OF STREAMLINES
-# ## JUST MATCH FINAL ENSEMBLE AND DO THIS LAST
-# if [ $SPC_LMAX gt 0 ]
-
-#    echo
-#    echo Tracking single parameter tractogram...
-#    echo
-   
-#    ## track single parameter seeding entire white matter
-#    streamtrack SD_PROB $OUTDIR/${DWIFILENAME}_lmax${spc_lmax}.mif $OUTDIR/spc_wm_tracts_csd_lmax${spc_lmax}_prob_NUM_500k.tck \
-#                -seed $OUTDIR/${DWIFILENAME}_wm.mif -mask $OUTDIR/${DWIFILENAME}_wm.mif -grad $GRAD -number 500000 -maxnum 1000000
-
-#    ## track single parameter tractogram seeding only corpus callosum
-#    streamtrack SD_PROB $OUTDIR/${DWIFILENAME}_lmax${spc_lmax}.mif $OUTDIR/spc_cc_csd_lmax${spc_lmax}_prob_NUM_100k.tck \
-#                -seed $OUTDIR/${DWIFILENAME}_cc.mif -mask $OUTDIR/${DWIFILENAME}_wm.mif -grad $GRAD -number 100000 -maxnum 500000
-   
-# fi
 
 echo 
 echo DONE tracking
