@@ -20,14 +20,14 @@ OUTDIR=./output
 mkdir $OUTDIR
 
 ## grab the config.json inputs
-DWI=`$SERVICE_DIR/jq -r '.dwi' config.json`
-BVALS=`$SERVICE_DIR/jq -r '.bvals' config.json`
-BVECS=`$SERVICE_DIR/jq -r '.bvecs' config.json`
+DWI=`$SERVICE_DIR/jq -r '.dwi' config.json`/dwi_aligned_trilin.nii.gz
+BVALS=`$SERVICE_DIR/jq -r '.bvals' config.json`/dwi_aligned_trilin.bvals
+BVECS=`$SERVICE_DIR/jq -r '.bvecs' config.json`/dwi_aligned_trilin.bvecs
 
-MASK=`$SERVICE_DIR/jq -r '.mask' config.json`
-WMMASK=`$SERVICE_DIR/jq -r '.wmmask' config.json`
-CCMASK=`$SERVICE_DIR/jq -r '.ccmask' config.json`
-TMASK=`$SERVICE_DIR/jq -r '.tmask' config.json`
+MASK=`$SERVICE_DIR/jq -r '.mask' config.json`/mask_anat.nii.gz
+WMMASK=`$SERVICE_DIR/jq -r '.wmmask' config.json`/wm_anat.nii.gz
+CCMASK=`$SERVICE_DIR/jq -r '.ccmask' config.json`/cc_anat.nii.gz
+TMASK=`$SERVICE_DIR/jq -r '.tmask' config.json`/wm_full.nii.gz
 
 DOPROB=`$SERVICE_DIR/jq -r '.do_probabilistic' config.json`
 PROB_CURVS=`$SERVICE_DIR/jq -r 'prob_curvs' config.json`
