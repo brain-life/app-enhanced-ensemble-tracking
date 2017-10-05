@@ -84,6 +84,8 @@ if [[ $MAXLMAX == "null" || -z $MAXLMAX ]]; then
     
 fi
 
+echo "Maximum L_{max} is set to ${MAXLMAX}."
+
 echo 
 echo Converting files for MRTrix processing...
 echo 
