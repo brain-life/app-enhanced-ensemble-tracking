@@ -30,7 +30,7 @@ CCMASK=`$SERVICE_DIR/jq -r '.ccmask' config.json`/cc_anat.nii.gz
 TMASK=`$SERVICE_DIR/jq -r '.tmask' config.json`/wm_full.nii.gz
 
 DOPROB=`$SERVICE_DIR/jq -r '.do_probabilistic' config.json`
-PROB_CURVS=`$SERVICE_DIR/jq -r 'prob_curvs' config.json`
+PROB_CURVS=`$SERVICE_DIR/jq -r '.prob_curvs' config.json`
 
 DOSTREAM=`$SERVICE_DIR/jq -r '.do_deterministic' config.json`
 STREAM_CURVS=`$SERVICE_DIR/jq -r '.stream_curvs' config.json`
