@@ -29,7 +29,7 @@ if [ -f jobid ]; then
     if [ $jobstate == "R" ]; then
 
 	subid=$(cat jobid | cut -d '.' -f 1)
-	logname="app-freesurfer.o$subid"
+	logname="app-enhanced-ensemble-tracking.o$subid"
 
         #get rough estimate of the progress by analyzing the size of output log
         #the algorithm relies on the expecation that final log size will be about 10500 lines
