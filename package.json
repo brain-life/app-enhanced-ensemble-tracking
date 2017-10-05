@@ -1,8 +1,7 @@
 {
   "name": "sca-service-enahnced-ensemble-tracking",
   "version": "1.0.0",
-  "description": "better ensemble tracking with extra tracking of undersampled
-  areas",
+  "description": "better ensemble tracking with extra tracking of undersampled areas",
   "main": "index.js",
   "directories": {
     "test": "test"
