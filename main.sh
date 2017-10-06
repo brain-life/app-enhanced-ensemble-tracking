@@ -16,7 +16,7 @@ if [ $ENV == "VM" ]; then
     source $FREESURFER_HOME/SetUpFreeSurfer.sh
 fi
 
-OUTDIR=$SERVICE_DIR/output
+OUTDIR=./output
 mkdir $OUTDIR
 
 ## grab the config.json inputs
@@ -110,7 +110,7 @@ if [ $DOTENSOR == "true" ]; then
    echo Fitting tensor model...
    echo
    
-   dwi2tensor -quiet $OUTPUT/dwi.mif -grad $GRAD $OUTPUT/dt.mif
+   dwi2tensor -quiet $OUTDIR/dwi.mif -grad $GRAD $OUTDIR/dt.mif
 
 fi
 
@@ -131,8 +131,8 @@ echo
 if [ $DOTENSOR == "true" ] ; then
 
     echo "Performing tensor tracking..."
-    streamtrack -quiet DT_STREAM $OUTPUT/dwi.mif $OUTPUT/wm_tensor.tck -seed $WMMASK -mask $TMASK -grad $GRAD -number $NUMWMFIBERS -maxnum $MAXNUMWMFIBERS
-    streamtrack -quiet DT_STREAM $OUTPUT/dwi.mif $OUTPUT/cc_tensor.tck -seed $CCMASK -mask $TMASK -grad $GRAD -number $NUMCCFIBERS -maxnum $MAXNUMCCFIBERS
+    streamtrack -quiet DT_STREAM $OUTDIR/dwi.mif $OUTDIR/wm_tensor.tck -seed $WMMASK -mask $TMASK -grad $GRAD -number $NUMWMFIBERS -maxnum $MAXNUMWMFIBERS
+    streamtrack -quiet DT_STREAM $OUTDIR/dwi.mif $OUTDIR/cc_tensor.tck -seed $CCMASK -mask $TMASK -grad $GRAD -number $NUMCCFIBERS -maxnum $MAXNUMCCFIBERS
     
 fi
 
@@ -142,8 +142,8 @@ if [ $DOSTREAM == "true" ] ; then
 
 	for i_curv in $STREAM_CURVS; do
 
-	    streamtrack -quiet SD_STREAM $OUTDIR/lmax${i_lmax}.mif $OUTPUT/detr_lmax${i_lmax}_curv${i_curv}_wm.tck -seed $WMMASK -mask $TMASK -grad $GRAD -curvature ${i_curv} -number $NUMWMFIBERS -maxnum $MAXNUMWMFIBERS
-	    streamtrack -quiet SD_STREAM $OUTDIR/lmax${i_lmax}.mif $OUTPUT/detr_lmax${i_lmax}_curv${i_curv}_cc.tck -seed $CCMASK -mask $TMASK -grad $GRAD -curvature ${i_curv} -number $NUMCCFIBERS -maxnum $MAXNUMCCFIBERS
+	    streamtrack -quiet SD_STREAM $OUTDIR/lmax${i_lmax}.mif $OUTDIR/detr_lmax${i_lmax}_curv${i_curv}_wm.tck -seed $WMMASK -mask $TMASK -grad $GRAD -curvature ${i_curv} -number $NUMWMFIBERS -maxnum $MAXNUMWMFIBERS
+	    streamtrack -quiet SD_STREAM $OUTDIR/lmax${i_lmax}.mif $OUTDIR/detr_lmax${i_lmax}_curv${i_curv}_cc.tck -seed $CCMASK -mask $TMASK -grad $GRAD -curvature ${i_curv} -number $NUMCCFIBERS -maxnum $MAXNUMCCFIBERS
 
 	done
 	
@@ -156,8 +156,8 @@ if [ $DOPROB == "true" ] ; then
 
 	for i_curv in $PROB_CURVS; do
 	    echo "Trying to track lmax $i_lmax with curvature $i_curv"
-	    streamtrack SD_PROB $OUTDIR/lmax${i_lmax}.mif $OUTPUT/prob_lmax${i_lmax}_curv${i_curv}_wm.tck -seed $WMMASK -mask $TMASK -grad $GRAD -curvature ${i_curv} -number $NUMWMFIBERS -maxnum $MAXNUMWMFIBERS
-	    streamtrack SD_PROB $OUTDIR/lmax${i_lmax}.mif $OUTPUT/prob_lmax${i_lmax}_curv${i_curv}_cc.tck -seed $CCMASK -mask $TMASK -grad $GRAD -curvature ${i_curv} -number $NUMCCFIBERS -maxnum $MAXNUMCCFIBERS
+	    streamtrack SD_PROB $OUTDIR/lmax${i_lmax}.mif $OUTDIR/prob_lmax${i_lmax}_curv${i_curv}_wm.tck -seed $WMMASK -mask $TMASK -grad $GRAD -curvature ${i_curv} -number $NUMWMFIBERS -maxnum $MAXNUMWMFIBERS
+	    streamtrack SD_PROB $OUTDIR/lmax${i_lmax}.mif $OUTDIR/prob_lmax${i_lmax}_curv${i_curv}_cc.tck -seed $CCMASK -mask $TMASK -grad $GRAD -curvature ${i_curv} -number $NUMCCFIBERS -maxnum $MAXNUMCCFIBERS
 
 	done
 	
