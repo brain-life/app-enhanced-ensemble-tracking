@@ -67,6 +67,7 @@ rm -f $OUTDIR/tmp.b
 
 GRAD=$OUTDIR/grad.b
 
+## THIS IS BROKE SOMEHOW
 MAXLMAX=`$SERVICE_DIR/jq -r '.max_lmax' config.json`
 if [[ $MAXLMAX == "null" || -z $MAXLMAX ]]; then
 
@@ -79,7 +80,7 @@ if [[ $MAXLMAX == "null" || -z $MAXLMAX ]]; then
     
     lmax=0
     while [ $((($lmax+3)*($lmax+4)/2)) -le $COUNT ]; do
-	    MAXLMAX=$(($lmax+2))
+	MAXLMAX=$(($lmax+2))
     done
     
 fi
@@ -135,6 +136,8 @@ if [ $DOTENSOR == "true" ] ; then
     
 fi
 
+echo $STREAM_CURVS
+
 if [ $DOSTREAM == "true" ] ; then
     
     for (( i_lmax=2; i_lmax<=$MAXLMAX; i_lmax+=2 )); do
@@ -148,6 +151,8 @@ if [ $DOSTREAM == "true" ] ; then
 	
     done
 fi
+
+echo $PROB_CURVS
 
 if [ $DOPROB == "true" ] ; then
     
