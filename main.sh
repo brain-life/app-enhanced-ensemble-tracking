@@ -33,7 +33,7 @@ DOPROB=`$SERVICE_DIR/jq -r '.do_probabilistic' config.json`
 PROB_CURVS=`$SERVICE_DIR/jq -r '.prob_curvs' config.json`
 
 DOSTREAM=`$SERVICE_DIR/jq -r '.do_deterministic' config.json`
-STREAM_CURVS=`$SERVICE_DIR/jq -r '.stream_curvs' config.json`
+STREAM_CURVS=`$SERVICE_DIR/jq -r '.detr_curvs' config.json`
 
 DOTENSOR=`$SERVICE_DIR/jq -r '.do_tensor' config.json`
 
@@ -152,7 +152,9 @@ if [ $DOSTREAM == "true" ] ; then
     done
 fi
 
-echo $PROB_CURVS
+for $i_iter in $PROB_CURVS; do
+    echo $i_iter
+done
 
 if [ $DOPROB == "true" ] ; then
     
