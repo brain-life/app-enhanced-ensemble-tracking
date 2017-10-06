@@ -142,7 +142,7 @@ if [ $DOSTREAM == "true" ] ; then
     
     for (( i_lmax=2; i_lmax<=$MAXLMAX; i_lmax+=2 )); do
 
-	for $i_curv in $STREAM_CURVS; do
+	for i_curv in $STREAM_CURVS; do
 
 	    streamtrack -quiet SD_STREAM $OUTDIR/lmax${i_lmax}.mif $OUTPUT/detr_lmax${i_lmax}_curv${i_curv}_wm.tck -seed $WMMASK -mask $TMASK -grad $GRAD -curvature ${i_curv} -number $NUMWMFIBERS -maxnum $MAXNUMWMFIBERS
 	    streamtrack -quiet SD_STREAM $OUTDIR/lmax${i_lmax}.mif $OUTPUT/detr_lmax${i_lmax}_curv${i_curv}_cc.tck -seed $CCMASK -mask $TMASK -grad $GRAD -curvature ${i_curv} -number $NUMCCFIBERS -maxnum $MAXNUMCCFIBERS
@@ -152,7 +152,7 @@ if [ $DOSTREAM == "true" ] ; then
     done
 fi
 
-for $i_iter in $PROB_CURVS; do
+for i_iter in $PROB_CURVS; do
     echo $i_iter
 done
 
@@ -160,7 +160,7 @@ if [ $DOPROB == "true" ] ; then
     
     for (( i_lmax=2; i_lmax<=$MAXLMAX; i_lmax+=2 )); do
 
-	for $i_curv in $PROB_CURVS; do
+	for i_curv in $PROB_CURVS; do
 
 	    streamtrack -quiet SD_PROB $OUTDIR/lmax${i_lmax}.mif $OUTPUT/prob_lmax${i_lmax}_curv${i_curv}_wm.tck -seed $WMMASK -mask $TMASK -grad $GRAD -curvature ${i_curv} -number $NUMWMFIBERS -maxnum $MAXNUMWMFIBERS
 	    streamtrack -quiet SD_PROB $OUTDIR/lmax${i_lmax}.mif $OUTPUT/prob_lmax${i_lmax}_curv${i_curv}_cc.tck -seed $CCMASK -mask $TMASK -grad $GRAD -curvature ${i_curv} -number $NUMCCFIBERS -maxnum $MAXNUMCCFIBERS
