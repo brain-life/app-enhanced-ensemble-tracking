@@ -79,7 +79,7 @@ if [[ $MAXLMAX == "null" || -z $MAXLMAX ]]; then
     
     lmax=0
     while [ $((($lmax+3)*($lmax+4)/2)) -le $COUNT ]; do
-	MAXLMAX=$(($lmax+2))
+	    MAXLMAX=$(($lmax+2))
     done
     
 fi
