@@ -16,7 +16,7 @@ if [ $ENV == "VM" ]; then
     source $FREESURFER_HOME/SetUpFreeSurfer.sh
 fi
 
-OUTDIR=./output
+OUTDIR=$SERVICE_DIR/output
 mkdir $OUTDIR
 
 ## grab the config.json inputs
