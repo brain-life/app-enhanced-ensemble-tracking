@@ -167,3 +167,11 @@ fi
 echo 
 echo DONE tracking
 echo
+
+echo 
+echo Creating Ensemble Tractogram...
+echo
+
+matlab -nosplash -nodisplay -r "ensemble_tck_generator.m"
+
+
