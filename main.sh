@@ -172,5 +172,5 @@ echo
 echo Creating Ensemble Tractogram...
 echo
 
-matlab -nodisplay -nosplash -r ensemble_tck_generator.m
+matlab -nodisplay -nosplash -r "$SERVICE_DIR/ensemble_tck_generator.m"
 
