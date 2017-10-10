@@ -15,10 +15,10 @@ ens = dir('output/*.tck');
 % pull all the file names
 ens_names = {ens.name};
 
-assignments = cell(length(ens_names), 2);
+%assignments = cell(length(ens_names), 2);
 
 % loop over and import all the ensemble connectomes
-ens_fg = dtiImportFibersMrtrix(char(ens_names(1)), .5)
+ens_fg = dtiImportFibersMrtrix(char(ens_names(1)), .5);
 
 for ii = 2:length(ens_names)
   
@@ -29,14 +29,14 @@ for ii = 2:length(ens_names)
   ens_fg.fibers = [ ens_fg.fibers; tfg.fibers ];
 
   % catch assignment order
-  assignments{ii, 1} = ens_names{ii};
-  assignments{ii, 2} = size(tfg.fibers, 1);
+  %assignments{ii, 1} = ens_names{ii};
+  %assignments{ii, 2} = size(tfg.fibers, 1);
   
 end
 
 % save out
 dtiExportFibersMrtrix(ens_fg, 'output/ensemble.tck')
-save('assignments.mat', 'assignments');
+%save('assignments.mat', 'assignments');
 
 end
 
