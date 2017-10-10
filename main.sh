@@ -67,7 +67,6 @@ rm -f $OUTDIR/tmp.b
 
 GRAD=$OUTDIR/grad.b
 
-## THIS IS BROKE SOMEHOW
 MAXLMAX=`$SERVICE_DIR/jq -r '.max_lmax' config.json`
 if [[ $MAXLMAX == "null" || -z $MAXLMAX ]]; then
 
@@ -75,12 +74,13 @@ if [[ $MAXLMAX == "null" || -z $MAXLMAX ]]; then
 
     ## determine count of b0s
     VOLS=`cat $OUTDIR/grad.b | wc -l`
-    BNOT=`grep '0 0 0 0' $OUTDIR/grad.b | wc -l`
+    BNOT=`grep ' 0$' $OUTDIR/grad.b | wc -l`
     COUNT=$(($VOLS-$BNOT))
     
     lmax=0
     while [ $((($lmax+3)*($lmax+4)/2)) -le $COUNT ]; do
-	MAXLMAX=$(($lmax+2))
+	    MAXLMAX=$(($lmax+2))
+        lmax=$MAXLMAX
     done
     
 fi
@@ -156,8 +156,8 @@ if [ $DOPROB == "true" ] ; then
 
 	for i_curv in $PROB_CURVS; do
 	    echo "Trying to track lmax $i_lmax with curvature $i_curv"
-	    streamtrack SD_PROB $OUTDIR/lmax${i_lmax}.mif $OUTDIR/prob_lmax${i_lmax}_curv${i_curv}_wm.tck -seed $WMMASK -mask $TMASK -grad $GRAD -curvature ${i_curv} -number $NUMWMFIBERS -maxnum $MAXNUMWMFIBERS
-	    streamtrack SD_PROB $OUTDIR/lmax${i_lmax}.mif $OUTDIR/prob_lmax${i_lmax}_curv${i_curv}_cc.tck -seed $CCMASK -mask $TMASK -grad $GRAD -curvature ${i_curv} -number $NUMCCFIBERS -maxnum $MAXNUMCCFIBERS
+	    streamtrack -quiet SD_PROB $OUTDIR/lmax${i_lmax}.mif $OUTDIR/prob_lmax${i_lmax}_curv${i_curv}_wm.tck -seed $WMMASK -mask $TMASK -grad $GRAD -curvature ${i_curv} -number $NUMWMFIBERS -maxnum $MAXNUMWMFIBERS
+	    streamtrack -quiet SD_PROB $OUTDIR/lmax${i_lmax}.mif $OUTDIR/prob_lmax${i_lmax}_curv${i_curv}_cc.tck -seed $CCMASK -mask $TMASK -grad $GRAD -curvature ${i_curv} -number $NUMCCFIBERS -maxnum $MAXNUMCCFIBERS
 
 	done
 	
@@ -172,6 +172,5 @@ echo
 echo Creating Ensemble Tractogram...
 echo
 
-matlab -nosplash -nodisplay -r "ensemble_tck_generator.m"
-
+matlab -nodisplay -nosplash -r ensemble_tck_generator.m
 
