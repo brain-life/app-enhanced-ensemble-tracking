@@ -43,6 +43,10 @@ MAXNUMWMFIBERS=$(($NUMWMFIBERS*2))
 NUMCCFIBERS=$(($NUMWMFIBERS/5))
 MAXNUMCCFIBERS=$(($NUMCCFIBERS*2))
 
+echo
+echo Create MRTrix grad.b
+echo
+
 ## make grad.b from bvals / bvecs
 cat $BVECS $BVALS >> $OUTDIR/tmp.b
 
@@ -174,7 +178,10 @@ echo
 echo Creating Ensemble Tractogram...
 echo
 
+
+echo `pwd`
+echo `ls`
 cat $SERVICE_DIR/ensemble_tck_generator.m
 
-matlab -nodisplay -nosplash -r "$SERVICE_DIR/ensemble_tck_generator.m"
+matlab -nosplash -nodisplay -r $SERVICE_DIR/ensemble_tck_generator.m
 
