@@ -178,10 +178,5 @@ echo
 echo Creating Ensemble Tractogram...
 echo
 
-
-echo `pwd`
-echo `ls`
-cat $SERVICE_DIR/ensemble_tck_generator.m
-
-matlab -nosplash -nodisplay -r $SERVICE_DIR/ensemble_tck_generator.m
+matlab -nosplash -nodisplay -r $SERVICE_DIR/ensemble_tck_generator
 
