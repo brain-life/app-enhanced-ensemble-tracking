@@ -18,7 +18,7 @@ ens_names = {ens.name};
 %assignments = cell(length(ens_names), 2);
 
 % loop over and import all the ensemble connectomes
-ens_fg = dtiImportFibersMrtrix(char(ens_names(1)), .5);
+ens_fg = dtiImportFibersMrtrix([ 'output/' char(ens_names(1)) ], .5);
 
 for ii = 2:length(ens_names)
   
