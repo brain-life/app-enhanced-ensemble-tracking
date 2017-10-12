@@ -168,9 +168,13 @@ echo
 echo DONE tracking
 echo
 
+#rm $SERVICE_DIR/output/*.mif
+
 echo 
 echo Creating Ensemble Tractogram...
 echo
+
+cat $SERVICE_DIR/ensemble_tck_generator.m
 
 matlab -nodisplay -nosplash -r "$SERVICE_DIR/ensemble_tck_generator.m"
 
