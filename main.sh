@@ -172,11 +172,26 @@ echo
 echo DONE tracking
 echo
 
-#rm $SERVICE_DIR/output/*.mif
-
 echo 
 echo Creating Ensemble Tractogram...
 echo
 
 matlab -nosplash -nodisplay -r ensemble_tck_generator
+
+echo
+echo Cleaning output directory...
+echo
+
+rm $SERVICE_DIR/*.nii
+rm $SERVICE_DIR/output/*.mif
+rm $SERVICE_DIR/output/grad.b
+rm $SERVICE_DIR/output/response.txt
+rm $SERVICE_DIR/output/*.nii.gz
+rm $SERVICE_DIR/output/*.nii
+rm $SERVICE_DIR/output/*tensor.tck
+rm $SERVICE_DIR/output/detr*.tck
+rm $SERVICE_DIR/output/prob*.tck
+
+
+
 
