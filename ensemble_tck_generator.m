@@ -35,7 +35,7 @@ for ii = 2:length(ens_names)
 end
 
 % save out
-dtiExportFibersMrtrix(ens_fg, 'output/track.tck')
+dtiExportFibersMrtrix(ens_fg, 'track.tck')
 %save('assignments.mat', 'assignments');
 
 end
