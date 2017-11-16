@@ -19,10 +19,15 @@ fi
 OUTDIR=./output
 mkdir $OUTDIR
 
+dtiinit=`$SERVICE_DIR/jq -r '.dtiinit' config.json`
+export DWI=$dtiinit/`$SERVICE_DIR/jq -r '.files.alignedDwRaw' $dtiinit/dt6.json`
+export BVALS=$dtiinit/`$SERVICE_DIR/jq -r '.files.alignedDwBvecs' $dtiinit/dt6.json`
+export BVECS=$dtiinit/`$SERVICE_DIR/jq -r '.files.alignedDwBvals' $dtiinit/dt6.json`
+
 ## grab the config.json inputs
-DWI=`$SERVICE_DIR/jq -r '.dwi' config.json`/dwi_aligned_trilin.nii.gz
-BVALS=`$SERVICE_DIR/jq -r '.bvals' config.json`/dwi_aligned_trilin.bvals
-BVECS=`$SERVICE_DIR/jq -r '.bvecs' config.json`/dwi_aligned_trilin.bvecs
+##DWI=`$SERVICE_DIR/jq -r '.dwi' config.json`/dwi_aligned_trilin.nii.gz
+##BVALS=`$SERVICE_DIR/jq -r '.bvals' config.json`/dwi_aligned_trilin.bvals
+##BVECS=`$SERVICE_DIR/jq -r '.bvecs' config.json`/dwi_aligned_trilin.bvecs
 
 MASK=`$SERVICE_DIR/jq -r '.mask' config.json`/mask_anat.nii.gz
 WMMASK=`$SERVICE_DIR/jq -r '.wmmask' config.json`/wm_anat.nii.gz
